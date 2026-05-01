@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dash Bot Tester</title>
+    <style>
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            background: #000; 
+        }
+        
+        .screen {
+            width: 100vw;
+            height: 100vh;
+            /* Using 100% 100% ensures the image fills the viewport exactly */
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .btn {
+            position: absolute;
+            background: rgba(255, 0, 0, 0); /* Set to 0.3 to see hitboxes for debugging */
+            z-index: 10;
+        }
+
+        /* Hitbox Coordinates based on your screenshots */
+        .hamburger { top: 5%; left: 3%; width: 15%; height: 8%; }
+        .nav-schedule { bottom: 4%; right: 4%; width: 18%; height: 10%; }
+        .see-next-btn { top: 62%; left: 25%; width: 50%; height: 7%; }
+        .list-item-chipotle { top: 34%; left: 0; width: 100%; height: 16%; }
+        .claim-btn { bottom: 2%; left: 5%; width: 90%; height: 9%; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="step-dashboard" class="screen" style="background-image: url('dashboard.png');">
+        <div class="btn hamburger" onclick="resetAndAdvance()"></div>
+        <div id="main-nav" class="btn nav-schedule"></div>
+    </div>
+
+    <div id="step-empty" class="hidden screen" style="background-image: url('empty.png');">
+        <div class="btn hamburger" onclick="resetAndAdvance()"></div>
+    </div>
+
+    <div id="step-seenext" class="hidden screen" style="background-image: url('seenext.png');">
+        <div class="btn hamburger" onclick="resetAndAdvance()"></div>
+        <div class="btn see-next-btn" onclick="show('step-list')"></div>
+    </div>
+
+    <div id="step-list" class="hidden screen" style="background-image: url('list.png');">
+        <div class="btn hamburger" onclick="resetAndAdvance()"></div>
+        <div class="btn list-item-chipotle" onclick="show('step-card')"></div>
+    </div>
+
+    <div id="step-card" class="hidden screen" style="background-image: url('card.png');">
+        <div class="btn hamburger" onclick="resetAndAdvance()"></div>
+        <div class="btn claim-btn" onclick="alert('Claimed!')"></div>
+    </div>
+
+    <script>
+        let scenarioCounter = 0;
+        // The three "Schedule" outcomes the bot expects to see in order
+        const scenarios = ['step-empty', 'step-seenext', 'step-list'];
+
+        function show(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function resetAndAdvance() {
+            // Cycle through scenarios for the next time the bot hits the schedule button
+            const nextScenario = scenarios[scenarioCounter];
+            document.getElementById('main-nav').onclick = () => show(nextScenario);
+            
+            scenarioCounter = (scenarioCounter + 1) % scenarios.length;
+            show('step-dashboard');
+        }
+
+        // Initialize the first click action
+        resetAndAdvance();
+    </script>
+</body>
+</html>
